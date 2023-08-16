@@ -1,36 +1,44 @@
-import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import ServiceForm, { type ServiceItemProperties } from "./ServiceForm";
 import BaseButton from "@/components/UI/BaseButton";
 import PlusIcon from "@assets/icon/plus.svg";
-import useGenerator from "@/hooks/useGenerator";
+import { services } from "@/store";
+import {
+  For,
+  Memo,
+  Show,
+  enableLegendStateReact,
+  useObservable,
+} from "@legendapp/state/react";
 
+let id = 1;
+enableLegendStateReact();
 const useServicesList = () => {
-  const [services, setService] = useGenerator().servicesState;
-
   const createNew = () => {
     const newService = {
+      id: id++,
       name: "Another service",
       description: "",
       image: "",
       price: "0",
       tags: [],
     };
-    setService((services) => [...services, newService]);
+    services.set((services) => [...services, newService]);
   };
 
-  const updateService = (index: number, service: ServiceItemProperties) => {
+  const updateService = (id: number, service: ServiceItemProperties) => {
     console.log(service);
-    setService((services) => {
+    services.set((services) => {
       const newServices = [...services];
+      const index = services.findIndex(({ id: _id }) => _id === id);
       newServices[index] = service;
       return newServices;
     });
   };
 
   const removeService = (index: number) => {
-    setService((services) => {
+    services.set((services) => {
       const newServices = [...services];
       newServices.splice(index, 1);
       return newServices;
@@ -38,7 +46,7 @@ const useServicesList = () => {
   };
 
   return {
-    services,
+    services: services,
     createNew,
     updateService,
     removeService,
@@ -46,26 +54,33 @@ const useServicesList = () => {
 };
 
 const ServiceSection = () => {
-  const { services, createNew, updateService, removeService } = useServicesList();
-  const [active, setActive] = useState(0);
+  const { services, createNew, updateService, removeService } =
+    useServicesList();
+  const active = useObservable(0);
 
   return (
     <div className="container py-6 md:py-10 grid h-full">
       <h1 className="text-3xl mb-4">Add your services</h1>
       <div className="grid gap-8 md:grid-cols-12 h-full overflow-hidden pb-8">
         <div className="flex flex-col col-span-4 gap-2 pe-4 overflow-auto pb-6">
-          {services.map(({ name }, index) => (
-            <div
-              key={index}
-              className={twMerge(
-                "rounded-lg px-4 py-2 w-full border cursor-pointer transition-all",
-                active === index ? "bg-blue-100 border-blue-600 bold" : ""
-              )}
-              onClick={() => setActive(index)}
-            >
-              {name || "empty"}
-            </div>
-          ))}
+          <For each={services}>
+            {(_service) => {
+              const service = _service as (typeof services)[number];
+              return (
+                <div
+                  className={twMerge(
+                    "rounded-lg px-4 py-2 w-full border cursor-pointer transition-all",
+                    active.get() === service.get().id
+                      ? "bg-blue-100 border-blue-600 bold"
+                      : ""
+                  )}
+                  onClick={() => active.set(service.get().id)}
+                >
+                  <Memo>{service.name}</Memo>
+                </div>
+              );
+            }}
+          </For>
           <BaseButton
             className="flex items-center gap-2 w-full text-left"
             onClick={() => createNew()}
@@ -74,13 +89,25 @@ const ServiceSection = () => {
             Create new service
           </BaseButton>
         </div>
-        <ServiceForm
-          className="col-span-8 pe-3 overflow-auto pb-6"
-          serviceItem={services[active]}
-          removeAble={services.length <= 1}
-          onChange={(serviceItem) => updateService(active, serviceItem)}
-          onRemove={() => removeService(active)}
-        />
+        <For each={services}>
+          {(_service) => {
+            const service = _service as (typeof services)[number];
+
+            return (
+              <Show if={service.id.get() === active.get()}>
+                <ServiceForm
+                  className="col-span-8 pe-3 overflow-auto pb-6"
+                  serviceItem={service.get()}
+                  removeAble={services.length <= 1}
+                  onChange={(serviceItem) =>
+                    updateService(service.id.get(), serviceItem)
+                  }
+                  onRemove={() => removeService(service.id.get())}
+                />
+              </Show>
+            );
+          }}
+        </For>
       </div>
     </div>
   );

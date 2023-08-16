@@ -1,52 +1,44 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import TextInput from "@/components/UI/TextInput";
 import { twMerge } from "tailwind-merge";
-
-type UrlsItem = {
-  name: string;
-  placeholder: string;
-};
-
-export type UpdatedList<T extends UrlsItem[] | Readonly<Readonly<UrlsItem>[]>> =
-  Record<T[number]["name"], string>;
+import {
+  enableLegendStateReact,
+  useObservable,
+  useObserve,
+} from "@legendapp/state/react";
+import { UpdatedList, UrlsItem, generateLinkList } from "@/data";
 interface UrlsInputProps<TItems extends UrlsItem | Readonly<UrlsItem>> {
   className?: string;
   items: TItems[] | Readonly<TItems[]>;
   onUpdate?: (args: UpdatedList<TItems[]>) => void;
 }
-
-const generateLinkList = <TItems extends UrlsItem | Readonly<UrlsItem>>(
-  items: TItems[] | Readonly<TItems[]>
-): UpdatedList<TItems[]> => {
-  return Object.assign({}, ...items.map((item) => ({ [item.name]: "" })));
-};
-
+enableLegendStateReact();
 const UrlsInput = <T extends UrlsItem>({
   items,
   className,
   onUpdate,
 }: UrlsInputProps<T>) => {
-  const [value, setValue] = useState("");
+  const urlValue = useObservable("");
+  const linksList = useObservable(generateLinkList(items));
   const [selected, SelectItem] = useState(0);
-  const [linksList, setLinksList] = useState(generateLinkList(items));
 
   useEffect(() => {
     const selectedName = items[selected].name;
 
-    if (selectedName || !(selectedName in linksList)) {
-      setValue(linksList[selectedName as keyof typeof linksList]);
+    if (selectedName || !(selectedName in linksList.get())) {
+      urlValue.set(linksList.get()[selectedName as keyof UpdatedList<T[]>]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  useEffect(() => {
-    setLinksList((prev) => ({
-      ...prev,
-      [items[selected].name]: value,
-    }));
-    onUpdate?.(linksList);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  useObserve(() => {
+    const url = urlValue.get();
+    linksList.set({
+      ...linksList.get(),
+      [items[selected].name]: url,
+    });
+    onUpdate?.(linksList.get());
+  });
 
   return (
     <div className={className}>
@@ -67,7 +59,7 @@ const UrlsInput = <T extends UrlsItem>({
       <TextInput
         name=""
         placeholder={items.at(selected)?.placeholder}
-        refValue={[value, setValue]}
+        refValue={urlValue}
       />
     </div>
   );

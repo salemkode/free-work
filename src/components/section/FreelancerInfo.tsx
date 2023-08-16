@@ -8,10 +8,10 @@ import BaseButton from "@components/UI/BaseButton";
 // images
 import PersonWallPaper from "@assets/personWallPaper.webp";
 import TagsInput from "@components/UI/TagsInput";
-import ServicesMarketplace from "@components/ServicesMarketplace";
-import SocialMedia from "@components/SocialMedia";
 import TextInput from "../UI/TextInput";
-import useGenerator from "@/hooks/useGenerator";
+import { name, description, websites, socialMedia } from "@/store";
+import UrlsInput from "../UI/UrlsInput";
+import { SocialMediaData, WebsitesData } from "@/data";
 
 export interface FreelancerInfoProps {
   className?: string;
@@ -21,8 +21,6 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({
   className = "",
   onComplete,
 }) => {
-  const { name, description } = useGenerator();
-
   return (
     <div className={twMerge("", className)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ">
@@ -43,14 +41,14 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({
             refValue={description}
             className="mt-2"
           />
-          <ServicesMarketplace />
-          <SocialMedia />
-          <TagsInput name="user-tags" label="User tags" className="my-2" />
-          <div className="flex">
-            <BaseButton className="px-6" onClick={onComplete}>
-              Go to next steps
-            </BaseButton>
-          </div>
+          <br />
+          <h3 className="font-bold">Websites</h3>
+          <UrlsInput items={WebsitesData} onUpdate={websites.set}/>
+          <br />
+          <h3 className="font-bold">Social media</h3>
+          <UrlsInput items={SocialMediaData} onUpdate={socialMedia.set} />
+          <br />
+          <TagsInput name="user-tags" label="Payment methods" placeholder="Add payment to accept" className="my-2" />
         </div>
         {/* Right side image */}
         <img

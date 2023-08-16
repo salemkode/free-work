@@ -6,9 +6,10 @@ interface TagsInputProps {
   name: string;
   className?: string;
   label?: string;
-  onChange?: (tags: string[]) => void
+  placeholder?: string;
+  onChange?: (tags: string[]) => void;
 }
-const TagsInput: React.FC<TagsInputProps> = ({ name, label, className, onChange }) => {
+const TagsInput: React.FC<TagsInputProps> = ({ name, label, className, placeholder, onChange }) => {
   const [tags, setTags] = useState([] as string[]);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +93,7 @@ const TagsInput: React.FC<TagsInputProps> = ({ name, label, className, onChange 
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleInputKeyDown}
-          placeholder="Add a tag"
+          placeholder={placeholder ? placeholder : "Add a tag"}
           className="outline-none min-w-[10ch] flex-grow"
         />
         <BaseButton onClick={addTag}>Add</BaseButton>

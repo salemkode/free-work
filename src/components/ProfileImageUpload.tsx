@@ -1,14 +1,12 @@
-import { useMemo } from "react";
 import { twMerge } from "tailwind-merge";
 import TextInput from "@components/UI/TextInput";
 import BaseButton from "@components/UI/BaseButton";
-import useGenerator from "@/hooks/useGenerator";
+import { useComputed } from "@legendapp/state/react";
+import { imageUrl } from "@/store";
 
 const useProfileImage = () => {
-  const imageUrlRef = useGenerator().imageUrl;
-  const [imageUrl] = imageUrlRef;
-  const imgComponentsProps = useMemo(() => {
-    if (!imageUrl) {
+  const imgComponentsProps = useComputed(() => {
+    if (!imageUrl.get()) {
       return {
         src: "/images/placeholder.png",
         alt: "Profile image placeholder image click to upload",
@@ -16,13 +14,13 @@ const useProfileImage = () => {
     }
 
     return {
-      src: imageUrl,
+      src: imageUrl.get(),
       alt: "Profile image click to upload new image",
     } as const;
-  }, [imageUrl]);
+  });
 
   return {
-    imageUrl: imageUrlRef,
+    imageUrl: imageUrl,
     imgComponentsProps,
   };
 };
@@ -48,7 +46,7 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
             />
             <img
               className="w-32 h-32 rounded-full overflow-hidden text-transparent object-cover cursor-pointer"
-              {...imgComponentsProps}
+              {...imgComponentsProps.get()}
             />
           </label>
         </div>
@@ -59,7 +57,7 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
             className="py-0 flex-grow"
             refValue={imageUrl}
           />
-          <BaseButton className="w-max !m-0" onClick={() => imageUrl[1]("")}>
+          <BaseButton className="w-max !m-0" onClick={() => imageUrl.set("")}>
             Reset
           </BaseButton>
         </div>

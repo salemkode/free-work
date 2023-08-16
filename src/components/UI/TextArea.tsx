@@ -1,12 +1,13 @@
 import { handleInput } from "@/modules/inputHandeler";
-import { State } from "@/types/react";
 import { twMerge } from "tailwind-merge";
+import { type Observable } from "@legendapp/state";
+import { Legend } from "@legendapp/state/react-components";
 
 interface TextAreaProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
   name: string;
   label?: string;
   className?: string;
-  refValue?: State<string>;
+  refValue: Observable<string>;
 }
 
 const TextArea: React.FC<TextAreaProps> = ({
@@ -25,7 +26,7 @@ const TextArea: React.FC<TextAreaProps> = ({
       >
         {label}
       </label>
-      <textarea
+      <Legend.textarea
         name={name}
         id={name}
         className="
@@ -34,8 +35,7 @@ const TextArea: React.FC<TextAreaProps> = ({
         ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 
         sm:text-sm sm:leading-6 mt-2 rounded-md shadow-sm"
         dir="auto"
-        value={refValue ? refValue[0] : restProps.value}
-        onInput={refValue ? handleInput(refValue[1]) : restProps.onInput}
+        value$={refValue}
         {...restProps}
       />
     </div>
