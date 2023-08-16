@@ -1,4 +1,3 @@
-import { handleInput } from "@/modules/inputHandeler";
 import { twMerge } from "tailwind-merge";
 import { type Observable } from "@legendapp/state";
 import { Legend } from "@legendapp/state/react-components";

@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge";
 
 import TextArea from "@components/UI/TextArea";
 import ProfileImageUpload from "@components/ProfileImageUpload";
-import BaseButton from "@components/UI/BaseButton";
 
 // images
 import PersonWallPaper from "@assets/personWallPaper.webp";
@@ -15,11 +14,9 @@ import { SocialMediaData, WebsitesData } from "@/data";
 
 export interface FreelancerInfoProps {
   className?: string;
-  onComplete?: () => void;
 }
 const FreelancerInfo: React.FC<FreelancerInfoProps> = ({
   className = "",
-  onComplete,
 }) => {
   return (
     <div className={twMerge("", className)}>
