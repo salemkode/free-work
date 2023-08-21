@@ -1,5 +1,4 @@
 import FreelancerInfo from "@components/section/FreelancerInfo";
-import HeroSection from "@components/section/HeroSection";
 import ScreenSlider from "@components/ScreenSlider";
 import ServiceSection from "@components/section/serviceSection/ServiceSection";
 import GenerateFile from "@/components/section/GenerateFile";
@@ -11,7 +10,6 @@ function App() {
     >
       <ScreenSlider
         elements={[
-          <HeroSection />,
           <FreelancerInfo />,
           <ServiceSection />,
           <GenerateFile />
