@@ -25,7 +25,7 @@ const useSlidesSteps = () => {
 const ScreenSlider = ({ elements = [] as Array<JSX.Element> }) => {
   const { index, observer } = useSlidesSteps();
   return (
-    <div className="snap-y snap-mandatory overflow-y-scroll no-scrollbar scroll-smooth h-screen relative scroll-mt-2">
+    <div>
       <div className="fixed -top-1 -left-1 -right-1 h-2 bg-white flex ">
         <div
           className={`bg-violet-600 transition-all duration-500 ${index / elements.length === 1 ? "" : "rounded-ee-full"}`}
@@ -38,7 +38,7 @@ const ScreenSlider = ({ elements = [] as Array<JSX.Element> }) => {
         <section
           ref={observer}
           key={index}
-          className="snap-start h-screen overflow-hidden"
+          className="min-h-screen overflow-x-hidden"
         >
           {element}
         </section>
